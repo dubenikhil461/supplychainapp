@@ -94,10 +94,10 @@ Response:
 5. Switch MetaMask to **Distributor** or **Retailer** and add steps on `/update`
 
 ### AI Fraud Detection Setup
-- The backend uses Google Gemini via `@google/generative-ai`
-- API key is read from `GEMINI_API_KEY` in `backend/.env`
-- Create `backend/.env` and add: `GEMINI_API_KEY=your_key_here`
-- Get a key at [aistudio.google.com](https://aistudio.google.com)
+- The backend calls **local Ollama** (`POST /api/fraud/analyse-product`); there is no Google Gemini dependency.
+- Install [Ollama](https://ollama.com), run it, then e.g. `ollama pull llama3.2`.
+- In `backend/.env` set `OLLAMA_URL=http://localhost:11434` (optional; that is the default).
+- After starting the API, open `GET http://localhost:<PORT>/api/fraud/health` — you should see `{"engine":"ollama",...}`. If you still see a Gemini error, you are hitting a **different/old Node process**; stop every `node` serving that port and start the backend again from this repo.
 
 ### Testing the Full Demo Flow
 1. Admin assigns roles (AdminPanel)

@@ -8,11 +8,28 @@ const { getContract } = require("../contract");
 
 const router = express.Router();
 
+/** Every fraud-route response includes this so DevTools can prove which backend answered (not Gemini). */
+const FRAUD_ENGINE = { engine: "ollama", fraudBackend: "ollama-only" };
+
+router.use((req, res, next) => {
+  res.setHeader("X-SupplyChain-Fraud-Engine", "ollama");
+  next();
+});
+
+console.info(
+  "[fraudRoutes] Fraud analysis uses local Ollama only (Gemini removed). GET /api/fraud/health to verify this server."
+);
+
+router.get("/health", (req, res) => {
+  const ollamaBase = (process.env.OLLAMA_URL || "http://localhost:11434").replace(/\/$/, "");
+  res.json({ ...FRAUD_ENGINE, ollamaUrl: ollamaBase });
+});
+
 router.post("/analyse-product", async (req, res) => {
   try {
     const { productId } = req.body;
     if (productId === undefined) {
-      return res.status(400).json({ success: false, message: "productId is required" });
+      return res.status(400).json({ ...FRAUD_ENGINE, success: false, message: "productId is required" });
     }
 
     const ollamaBase = (process.env.OLLAMA_URL || "http://localhost:11434").replace(/\/$/, "");
@@ -58,6 +75,7 @@ ${formattedHistory}`,
     if (!response.ok) {
       const errText = await response.text().catch(() => "");
       return res.status(502).json({
+        ...FRAUD_ENGINE,
         success: false,
         message: `Ollama request failed (${response.status}): ${errText.slice(0, 500)}`
       });
@@ -71,18 +89,20 @@ ${formattedHistory}`,
       report = JSON.parse(clean);
     } catch (parseErr) {
       return res.status(500).json({
+        ...FRAUD_ENGINE,
         success: false,
         message: "AI response was not valid JSON. Try again or check the model output.",
         snippet: clean.slice(0, 280)
       });
     }
 
-    return res.json({ success: true, report });
+    return res.json({ ...FRAUD_ENGINE, success: true, report });
   } catch (error) {
     const cause = error?.cause;
     const causeDetail =
       cause && typeof cause === "object" && "message" in cause ? cause.message : cause ? String(cause) : undefined;
     return res.status(500).json({
+      ...FRAUD_ENGINE,
       success: false,
       message: error.message || "Failed to analyse product journey",
       ...(causeDetail && { cause: causeDetail })
