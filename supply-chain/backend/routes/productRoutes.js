@@ -8,6 +8,10 @@ const QRCode = require("qrcode");
 const { getContract } = require("../contract");
 
 const router = express.Router();
+
+/** Smallest positive integer not yet used as a product id (sequential scan; fine for local Ganache). */
+const MAX_PRODUCT_ID_SCAN = 10_000;
+
 const ROLE_NAMES = {
   0: "None",
   1: "Manufacturer",
@@ -35,6 +39,27 @@ function formatContractError(error, fallbackMessage) {
 
   return base;
 }
+
+router.get("/next-product-id", async (req, res) => {
+  try {
+    const contract = await getContract();
+    for (let i = 1; i <= MAX_PRODUCT_ID_SCAN; i++) {
+      const row = await contract.products(i);
+      if (!row.isCreated) {
+        return res.json({ success: true, nextId: i });
+      }
+    }
+    return res.status(500).json({
+      success: false,
+      message: `No free product id found in range 1..${MAX_PRODUCT_ID_SCAN}`
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: formatContractError(error, "Failed to compute next product id")
+    });
+  }
+});
 
 router.post("/product-qr", async (req, res) => {
   try {

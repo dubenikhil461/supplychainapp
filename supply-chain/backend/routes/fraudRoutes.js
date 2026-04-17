@@ -1,7 +1,7 @@
 /**
  * filename: backend/routes/fraudRoutes.js
  * purpose: AI-powered fraud analysis for product journeys via local Ollama.
- * setup notes: Set OLLAMA_URL in backend/.env (default http://localhost:11434). Pull model e.g. ollama pull llama3.2
+ * setup notes: Set OLLAMA_URL and OLLAMA_MODEL in backend/.env. Run `ollama pull <model>` for the model you choose.
  */
 const express = require("express");
 const { getContract } = require("../contract");
@@ -22,7 +22,8 @@ console.info(
 
 router.get("/health", (req, res) => {
   const ollamaBase = (process.env.OLLAMA_URL || "http://localhost:11434").replace(/\/$/, "");
-  res.json({ ...FRAUD_ENGINE, ollamaUrl: ollamaBase });
+  const ollamaModel = process.env.OLLAMA_MODEL || "llama3.2";
+  res.json({ ...FRAUD_ENGINE, ollamaUrl: ollamaBase, ollamaModel });
 });
 
 router.post("/analyse-product", async (req, res) => {
@@ -33,6 +34,7 @@ router.post("/analyse-product", async (req, res) => {
     }
 
     const ollamaBase = (process.env.OLLAMA_URL || "http://localhost:11434").replace(/\/$/, "");
+    const ollamaModel = process.env.OLLAMA_MODEL || "llama3.2";
 
     const contract = await getContract();
     const history = await contract.getProductHistory(productId);
@@ -50,7 +52,7 @@ router.post("/analyse-product", async (req, res) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "llama3.2",
+        model: ollamaModel,
         prompt: `You are a supply chain fraud detection AI.
 Analyse these blockchain product steps and return ONLY raw JSON.
 No markdown, no backticks, no explanation. Just the JSON object.
@@ -74,10 +76,15 @@ ${formattedHistory}`,
 
     if (!response.ok) {
       const errText = await response.text().catch(() => "");
+      let message = `Ollama request failed (${response.status}): ${errText.slice(0, 500)}`;
+      if (response.status === 404 || /not found/i.test(errText)) {
+        message += ` Install a model (e.g. ollama pull ${ollamaModel}) or set OLLAMA_MODEL in backend/.env to a name from ollama list.`;
+      }
       return res.status(502).json({
         ...FRAUD_ENGINE,
         success: false,
-        message: `Ollama request failed (${response.status}): ${errText.slice(0, 500)}`
+        message,
+        ollamaModel
       });
     }
 

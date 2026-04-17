@@ -1,14 +1,16 @@
 /**
  * filename: frontend/src/pages/UpdateProduct.jsx
  * purpose: Form to append supply-chain status updates to product history.
- * setup notes: Writes on-chain via MetaMask signer calling addStep.
+ * setup notes: Writes on-chain via MetaMask signer calling addStep. Prefills from ?productId= or last created ID in localStorage.
  */
-import React from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ethers } from "ethers";
 import toast from "react-hot-toast";
 import { ABI, CONTRACT_ADDRESS } from "../contractConfig";
 import { formatEthersError } from "../utils/ethersError";
+
+const LAST_PRODUCT_ID_KEY = "supplychain:lastProductId";
 
 const STATUS_OPTIONS = [
   "Manufactured",
@@ -21,10 +23,21 @@ const STATUS_OPTIONS = [
 ];
 
 function UpdateProduct() {
+  const [searchParams] = useSearchParams();
   const [productId, setProductId] = useState("");
   const [location, setLocation] = useState("");
   const [status, setStatus] = useState(STATUS_OPTIONS[0]);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fromQuery = searchParams.get("productId");
+    if (fromQuery != null && String(fromQuery).trim() !== "") {
+      setProductId(String(fromQuery).trim());
+      return;
+    }
+    const stored = localStorage.getItem(LAST_PRODUCT_ID_KEY);
+    if (stored) setProductId(stored);
+  }, [searchParams]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -42,6 +55,7 @@ function UpdateProduct() {
       const tx = await contract.addStep(BigInt(productId), location, status);
       await tx.wait();
 
+      localStorage.setItem(LAST_PRODUCT_ID_KEY, String(productId));
       toast.success(`Step added. Tx: ${tx.hash}`);
       setLocation("");
     } catch (error) {
@@ -65,6 +79,9 @@ function UpdateProduct() {
             type="number"
             value={productId}
           />
+          <p className="mt-1 text-xs text-slate-500">
+            Filled from <code className="text-slate-700">/update?productId=…</code> or your last created product on this browser.
+          </p>
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-slate-700">Location</label>
