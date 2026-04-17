@@ -1,12 +1,14 @@
 /**
  * filename: frontend/src/pages/UpdateProduct.jsx
  * purpose: Form to append supply-chain status updates to product history.
- * setup notes: Calls backend endpoint /api/add-step.
+ * setup notes: Writes on-chain via MetaMask signer calling addStep.
  */
 import React from "react";
 import { useState } from "react";
-import axios from "axios";
+import { ethers } from "ethers";
 import toast from "react-hot-toast";
+import { ABI, CONTRACT_ADDRESS } from "../contractConfig";
+import { formatEthersError } from "../utils/ethersError";
 
 const STATUS_OPTIONS = [
   "Manufactured",
@@ -28,16 +30,22 @@ function UpdateProduct() {
     event.preventDefault();
     try {
       setIsLoading(true);
-      const response = await axios.post("/api/add-step", {
-        productId: Number(productId),
-        location,
-        status
-      });
-      toast.success(`Step added. Tx: ${response.data.txHash}`);
+      if (!window.ethereum) {
+        toast.error("MetaMask not found. Please install it first.");
+        return;
+      }
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+      const tx = await contract.addStep(BigInt(productId), location, status);
+      await tx.wait();
+
+      toast.success(`Step added. Tx: ${tx.hash}`);
       setLocation("");
     } catch (error) {
-      const message = error.response?.data?.message || error.message || "Failed to add step";
-      toast.error(message);
+      toast.error(formatEthersError(error, "Failed to add step"));
     } finally {
       setIsLoading(false);
     }

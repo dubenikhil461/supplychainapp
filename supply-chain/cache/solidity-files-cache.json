@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/nikhil/supplychainapp/supply-chain/contracts/SupplyChain.sol": {
-      "lastModificationDate": 1776449062203,
-      "contentHash": "13f51e9166587186dd112ec1db25ff7e",
+      "lastModificationDate": 1776451960329,
+      "contentHash": "1530dd7517fddd12d23be6ccc84d0049",
       "sourceName": "contracts/SupplyChain.sol",
       "solcConfig": {
         "version": "0.8.20",

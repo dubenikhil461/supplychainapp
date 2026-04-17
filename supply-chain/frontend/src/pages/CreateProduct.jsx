@@ -1,12 +1,15 @@
 /**
  * filename: frontend/src/pages/CreateProduct.jsx
  * purpose: Form for creating a product and showing generated QR code.
- * setup notes: Calls backend endpoint /api/create-product.
+ * setup notes: Creates on-chain via MetaMask signer; QR generated via /api/product-qr.
  */
 import React from "react";
 import { useState } from "react";
 import axios from "axios";
+import { ethers } from "ethers";
 import toast from "react-hot-toast";
+import { ABI, CONTRACT_ADDRESS } from "../contractConfig";
+import { formatEthersError } from "../utils/ethersError";
 
 function CreateProduct() {
   const [id, setId] = useState("");
@@ -32,15 +35,23 @@ function CreateProduct() {
     event.preventDefault();
     try {
       setIsLoading(true);
-      const response = await axios.post("/api/create-product", {
-        id: Number(id),
-        name
-      });
-      setQrCode(response.data.qrCode);
-      toast.success(`Product created. Tx: ${response.data.txHash}`);
+      if (!window.ethereum) {
+        toast.error("MetaMask not found. Please install it first.");
+        return;
+      }
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+
+      const tx = await contract.createProduct(BigInt(id), name);
+      await tx.wait();
+
+      const qrResponse = await axios.post("/api/product-qr", { id: Number(id) });
+      setQrCode(qrResponse.data.qrCode);
+      toast.success(`Product created. Tx: ${tx.hash}`);
     } catch (error) {
-      const message = error.response?.data?.message || error.message || "Failed to create product";
-      toast.error(message);
+      toast.error(formatEthersError(error, "Failed to create product"));
     } finally {
       setIsLoading(false);
     }

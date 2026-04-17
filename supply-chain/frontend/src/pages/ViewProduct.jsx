@@ -9,6 +9,8 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import Timeline from "../components/Timeline";
 import QRScanner from "../components/QRScanner";
+import JourneyMap from "../components/JourneyMap";
+import FraudReport from "../components/FraudReport";
 
 function truncateAddress(address) {
   if (!address) return "";
@@ -21,6 +23,7 @@ function ViewProduct() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [mapLoading, setMapLoading] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -48,6 +51,8 @@ function ViewProduct() {
     return <div className="rounded-lg bg-white p-6 shadow">Loading product details...</div>;
   }
 
+  const validLocationSteps = history.filter((step) => step.location && step.location.trim().length > 1);
+
   return (
     <div className="space-y-6">
       {id === "scan" ? (
@@ -73,12 +78,27 @@ function ViewProduct() {
               <span className="font-semibold">Current Owner:</span> {truncateAddress(product?.currentOwner)}
             </p>
           </div>
+          <button
+            className="mt-5 rounded-md bg-indigo-600 px-4 py-2 font-semibold text-white hover:bg-indigo-500"
+            onClick={() => window.open(`/api/certificate/certificate/${id}`, "_blank")}
+            type="button"
+          >
+            📥 Download Certificate
+          </button>
+          {validLocationSteps.length >= 2 ? (
+            <div className="mt-6">
+              <h2 className="mb-2 text-lg font-semibold text-slate-800">Live Product Journey Map</h2>
+              {mapLoading ? <p className="mb-2 text-sm text-slate-600">Loading map...</p> : null}
+              <JourneyMap onLoadingChange={setMapLoading} steps={history} />
+            </div>
+          ) : null}
           <div className="mt-6">
             <Timeline steps={history} />
           </div>
         </div>
       )}
       <QRScanner />
+      {id !== "scan" && !error ? <FraudReport productId={id} /> : null}
     </div>
   );
 }

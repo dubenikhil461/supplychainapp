@@ -3,9 +3,14 @@
  * purpose: Shared frontend contract address and ABI configuration.
  * setup notes: Replace CONTRACT_ADDRESS after deploying contract.
  */
-export const CONTRACT_ADDRESS = "0x29181bA99eCd8099509fA4842dc5d911dC27A57B"; // TODO: Replace CONTRACT_ADDRESS after deployment
+export const CONTRACT_ADDRESS = "0x7A243252C9261f2ACA21e4eF5B9ddd01c9a4e47E"; // TODO: Replace CONTRACT_ADDRESS after deployment
 
 export const ABI = [
+  {
+    inputs: [],
+    stateMutability: "nonpayable",
+    type: "constructor"
+  },
   {
     anonymous: false,
     inputs: [
@@ -14,6 +19,15 @@ export const ABI = [
       { indexed: true, internalType: "address", name: "owner", type: "address" }
     ],
     name: "ProductCreated",
+    type: "event"
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "addr", type: "address" },
+      { indexed: false, internalType: "enum SupplyChain.Role", name: "role", type: "uint8" }
+    ],
+    name: "RoleAssigned",
     type: "event"
   },
   {
@@ -34,6 +48,23 @@ export const ABI = [
       { internalType: "string", name: "_status", type: "string" }
     ],
     name: "addStep",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "admin",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "_addr", type: "address" },
+      { internalType: "enum SupplyChain.Role", name: "_role", type: "uint8" }
+    ],
+    name: "assignRole",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function"
@@ -83,6 +114,20 @@ export const ABI = [
         type: "tuple[]"
       }
     ],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [{ internalType: "address", name: "_addr", type: "address" }],
+    name: "getRole",
+    outputs: [{ internalType: "enum SupplyChain.Role", name: "", type: "uint8" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "roles",
+    outputs: [{ internalType: "enum SupplyChain.Role", name: "", type: "uint8" }],
     stateMutability: "view",
     type: "function"
   }

@@ -1,7 +1,7 @@
 /**
  * filename: frontend/vite.config.js
  * purpose: Vite configuration with backend API proxy.
- * setup notes: Proxy /api to Express server on port 5001 by default.
+ * setup notes: Proxy /api to Express; target port must match backend (e.g. PORT in backend/.env).
  */
 import { defineConfig } from "vite";
 
@@ -10,7 +10,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "http://localhost:5001",
+        target: "http://localhost:5008",
         changeOrigin: true
       }
     }

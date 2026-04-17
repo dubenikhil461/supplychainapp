@@ -8,13 +8,17 @@ const cors = require("cors");
 require("dotenv").config();
 
 const productRoutes = require("./routes/productRoutes");
+const fraudRoutes = require("./routes/fraudRoutes");
+const certificateRoutes = require("./routes/certificateRoutes");
 
 const app = express();
-const PORT = Number(process.env.PORT) || 5001;
+const PORT = Number(process.env.PORT) || 5008;
 
 app.use(cors());
 app.use(express.json());
 app.use("/api", productRoutes);
+app.use("/api/fraud", fraudRoutes);
+app.use("/api/certificate", certificateRoutes);
 
 app.get("/", async (req, res) => {
   try {

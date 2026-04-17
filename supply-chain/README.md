@@ -32,7 +32,8 @@ Paste address in:
 ```bash
 cd backend && npm install && node index.js
 ```
-→ Runs on <http://localhost:5000>
+→ Runs on <http://localhost:5001> by default (avoids macOS using port `5000` for AirPlay).  
+Override with `PORT=...` if needed; if you change it, update `frontend/vite.config.js` proxy `target` to match.
 
 ## Step 5 — Run Frontend
 ```bash
@@ -46,33 +47,18 @@ cd frontend && npm install && npm run dev
 
 ## API Reference
 
-### 1) `POST /api/create-product`
+### 1) `POST /api/product-qr`
 Request body:
 ```json
 {
-  "id": 101,
-  "name": "Medicine Batch A1"
+  "id": 101
 }
 ```
 Response:
 - `success`: boolean
-- `txHash`: blockchain transaction hash
-- `qrCode`: base64 PNG data URL
+- `qrCode`: base64 PNG data URL for `http://localhost:5173/product/<id>`
 
-### 2) `POST /api/add-step`
-Request body:
-```json
-{
-  "productId": 101,
-  "location": "Warehouse Hub 2",
-  "status": "In Transit"
-}
-```
-Response:
-- `success`: boolean
-- `txHash`: blockchain transaction hash
-
-### 3) `GET /api/product/:id`
+### 2) `GET /api/product/:id`
 Example:
 ```bash
 GET /api/product/101
@@ -81,8 +67,42 @@ Response includes:
 - `product`: `{ id, name, currentOwner, isCreated }`
 - `history`: array of `{ location, status, timestamp, updatedBy }`
 
+### 3) `GET /api/get-role/:address`
+Example:
+```bash
+GET /api/get-role/0xYourAddressHere
+```
+Response:
+- `address`, `role` (0-3), `roleName` (`None|Manufacturer|Distributor|Retailer`)
+
 ## How QR Code Works
-- When a product is created, backend stores product data on-chain and generates a QR code containing `http://localhost:5173/product/<id>`.
+- After a product is created on-chain via MetaMask, the frontend requests `POST /api/product-qr` to generate a QR code containing `http://localhost:5173/product/<id>`.
 - Backend returns that QR image as a base64 PNG data URL, and frontend renders it immediately.
 - Any user scans the QR with the built-in scanner, which decodes the URL and opens the product tracking page.
 - The tracking page reads the product id, fetches immutable blockchain history through API, and displays a timeline.
+
+## Enhancements Added
+
+### Role Setup (do this after deployment)
+1. Open AdminPanel at http://localhost:5173/admin
+2. Connect MetaMask as the **deployer/admin** wallet (the `admin` address on-chain)
+3. Assign roles **to the three participant wallets** you will use in MetaMask:
+   - Manufacturer wallet → **Manufacturer**
+   - Distributor wallet → **Distributor**
+   - Retailer wallet → **Retailer**
+4. Switch MetaMask to the **Manufacturer** wallet and create products on `/`
+5. Switch MetaMask to **Distributor** or **Retailer** and add steps on `/update`
+
+### AI Fraud Detection Setup
+- The backend uses Google Gemini via `@google/generative-ai`
+- API key is read from `GEMINI_API_KEY` in `backend/.env`
+- Create `backend/.env` and add: `GEMINI_API_KEY=your_key_here`
+- Get a key at [aistudio.google.com](https://aistudio.google.com)
+
+### Testing the Full Demo Flow
+1. Admin assigns roles (AdminPanel)
+2. Manufacturer creates product (MetaMask manufacturer wallet)
+3. Distributor adds "Shipped from Mumbai" (MetaMask distributor wallet)
+4. Retailer adds "Delivered to Delhi" (MetaMask retailer wallet)
+5. Scan QR → see map, timeline, fraud report
+6. Download certificate PDF

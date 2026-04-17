@@ -8,6 +8,11 @@ const { ethers } = require("ethers");
 const provider = new ethers.JsonRpcProvider("http://127.0.0.1:7545");
 const ABI = [
   {
+    inputs: [],
+    stateMutability: "nonpayable",
+    type: "constructor"
+  },
+  {
     anonymous: false,
     inputs: [
       { indexed: true, internalType: "uint256", name: "id", type: "uint256" },
@@ -15,6 +20,15 @@ const ABI = [
       { indexed: true, internalType: "address", name: "owner", type: "address" }
     ],
     name: "ProductCreated",
+    type: "event"
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: true, internalType: "address", name: "addr", type: "address" },
+      { indexed: false, internalType: "enum SupplyChain.Role", name: "role", type: "uint8" }
+    ],
+    name: "RoleAssigned",
     type: "event"
   },
   {
@@ -35,6 +49,23 @@ const ABI = [
       { internalType: "string", name: "_status", type: "string" }
     ],
     name: "addStep",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    inputs: [],
+    name: "admin",
+    outputs: [{ internalType: "address", name: "", type: "address" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "_addr", type: "address" },
+      { internalType: "enum SupplyChain.Role", name: "_role", type: "uint8" }
+    ],
+    name: "assignRole",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function"
@@ -88,6 +119,13 @@ const ABI = [
     type: "function"
   },
   {
+    inputs: [{ internalType: "address", name: "_addr", type: "address" }],
+    name: "getRole",
+    outputs: [{ internalType: "enum SupplyChain.Role", name: "", type: "uint8" }],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
     inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     name: "productHistory",
     outputs: [
@@ -110,10 +148,17 @@ const ABI = [
     ],
     stateMutability: "view",
     type: "function"
+  },
+  {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "roles",
+    outputs: [{ internalType: "enum SupplyChain.Role", name: "", type: "uint8" }],
+    stateMutability: "view",
+    type: "function"
   }
 ];
 
-const CONTRACT_ADDRESS = "0x29181bA99eCd8099509fA4842dc5d911dC27A57B"; // TODO: Replace CONTRACT_ADDRESS after deployment
+const CONTRACT_ADDRESS = "0x7A243252C9261f2ACA21e4eF5B9ddd01c9a4e47E"; // TODO: Replace CONTRACT_ADDRESS after deployment
 
 async function getContract() {
   try {
@@ -124,4 +169,4 @@ async function getContract() {
   }
 }
 
-module.exports = { getContract, ABI };
+module.exports = { getContract, ABI, CONTRACT_ADDRESS };
