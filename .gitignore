@@ -1,0 +1,36 @@
+# Dependencies (all nested)
+**/node_modules/
+
+# Build output (all nested)
+**/dist/
+**/build/
+**/.next/
+**/.nuxt/
+**/.svelte-kit/
+
+# Logs
+**/logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Cache and temp (all nested)
+**/.cache/
+**/.tmp/
+**/tmp/
+**/coverage/
+**/.parcel-cache/
+**/.turbo/
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,22 @@
+{
+  "_comment": {
+    "filename": "backend/package.json",
+    "purpose": "Backend dependencies and runtime scripts.",
+    "setupNotes": "Run npm install inside backend before starting API."
+  },
+  "name": "supply-chain-backend",
+  "version": "1.0.0",
+  "description": "Express API for blockchain supply chain tracking",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "ethers": "^6.13.2",
+    "express": "^4.19.2",
+    "qrcode": "^1.5.3"
+  }
+}

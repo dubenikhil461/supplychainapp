@@ -1,0 +1,19 @@
+{
+  "_comment": {
+    "filename": "package.json",
+    "purpose": "Root Hardhat project config and scripts.",
+    "setupNotes": "Run npm install here before compiling/deploying contracts."
+  },
+  "name": "supply-chain",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy:ganache": "hardhat run scripts/deploy.js --network ganache"
+  },
+  "devDependencies": {
+    "hardhat": "^2.22.10",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0"
+  }
+}
