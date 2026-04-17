@@ -5,7 +5,7 @@
  */
 import React from "react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -69,36 +69,55 @@ function Navbar() {
     syncAccount();
   }, []);
 
+  const navLinkClass = ({ isActive }) =>
+    [
+      "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+      isActive
+        ? "bg-white/10 text-white shadow-inner shadow-black/20"
+        : "text-slate-300 hover:bg-white/5 hover:text-cyan-200",
+    ].join(" ");
+
   return (
-    <nav className="bg-slate-900 text-white shadow-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <div className="text-lg font-bold">⛓ SupplyChain</div>
-        <div className="flex items-center gap-4 text-sm md:text-base">
-          <Link className="hover:text-cyan-300" to="/">
-            Create Product
-          </Link>
-          <Link className="hover:text-cyan-300" to="/update">
-            Update Status
-          </Link>
-          <Link className="hover:text-cyan-300" to="/product/scan">
-            Scan QR
-          </Link>
-          <Link className="hover:text-cyan-300" to="/admin">
+    <nav className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/75 text-white shadow-[0_8px_32px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-4">
+        <Link className="group flex items-center gap-2 text-lg font-bold tracking-tight" to="/">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 to-violet-500 text-lg shadow-lg shadow-cyan-500/25 ring-1 ring-white/20">
+            ⛓
+          </span>
+          <span className="bg-gradient-to-r from-white via-cyan-100 to-cyan-300 bg-clip-text text-transparent">
+            SupplyChain
+          </span>
+        </Link>
+        <div className="order-3 flex w-full flex-wrap items-center justify-center gap-1 sm:order-none sm:w-auto sm:justify-end">
+          <NavLink className={navLinkClass} end to="/">
+            Create
+          </NavLink>
+          <NavLink className={navLinkClass} to="/update">
+            Update
+          </NavLink>
+          <NavLink className={navLinkClass} to="/product/scan">
+            Scan
+          </NavLink>
+          <NavLink className={navLinkClass} to="/admin">
             Admin
-          </Link>
+          </NavLink>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 sm:gap-3">
           {walletAddress ? (
-            <span className={`rounded-full px-2 py-1 text-xs font-semibold ${roleBadgeClasses(roleName)}`}>
+            <span
+              className={`hidden max-w-[8rem] truncate rounded-full px-2.5 py-1 text-xs font-semibold shadow sm:inline-flex sm:max-w-none ${roleBadgeClasses(roleName)}`}
+            >
               {roleName}
             </span>
           ) : null}
           <button
-            className="rounded-md bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-cyan-400"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-400 to-cyan-500 px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/30 transition hover:from-cyan-300 hover:to-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-300/60"
             onClick={connectWallet}
             type="button"
           >
-            {walletAddress ? truncateAddress(walletAddress) : "Connect Wallet"}
+            <span className="font-mono text-xs opacity-90">
+              {walletAddress ? truncateAddress(walletAddress) : "Connect wallet"}
+            </span>
           </button>
         </div>
       </div>

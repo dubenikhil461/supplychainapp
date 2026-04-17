@@ -66,55 +66,68 @@ function UpdateProduct() {
   };
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow">
-      <h1 className="mb-4 text-2xl font-bold text-slate-800">Update Product Status</h1>
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">Product ID</label>
-          <input
-            className="w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400"
-            min="1"
-            onChange={(event) => setProductId(event.target.value)}
-            required
-            type="number"
-            value={productId}
-          />
-          <p className="mt-1 text-xs text-slate-500">
-            Filled from <code className="text-slate-700">/update?productId=…</code> or your last created product on this browser.
-          </p>
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">Location</label>
-          <input
-            className="w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400"
-            onChange={(event) => setLocation(event.target.value)}
-            required
-            type="text"
-            value={location}
-          />
-        </div>
-        <div>
-          <label className="mb-1 block text-sm font-medium text-slate-700">Status</label>
-          <select
-            className="w-full rounded-md border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cyan-400"
-            onChange={(event) => setStatus(event.target.value)}
-            value={status}
+    <div className="space-y-6">
+      <div className="rounded-2xl border border-white/10 bg-gradient-to-br from-slate-900/90 to-slate-950/90 p-6 shadow-2xl shadow-black/40 backdrop-blur-sm sm:p-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-300/80">Handoff</p>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-white">Update product status</h1>
+        <p className="mt-2 max-w-xl text-sm text-slate-400">
+          Record location and stage on-chain so buyers and auditors can trust the trail.
+        </p>
+      </div>
+      <div className="rounded-2xl border border-white/10 bg-slate-900/50 p-6 shadow-xl shadow-black/30 backdrop-blur-md sm:p-8">
+        <form className="space-y-5" onSubmit={handleSubmit}>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-300">Product ID</label>
+            <input
+              className="w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 font-mono text-sm text-cyan-100 shadow-inner shadow-black/40 focus:border-cyan-400/50 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
+              min="1"
+              onChange={(event) => setProductId(event.target.value)}
+              required
+              type="number"
+              value={productId}
+            />
+            <p className="mt-2 text-xs text-slate-500">
+              Filled from <code className="rounded bg-white/5 px-1.5 py-0.5 font-mono text-slate-300">/update?productId=…</code>{" "}
+              or your last created product in this browser.
+            </p>
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-300">Location</label>
+            <input
+              className="w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 placeholder:text-slate-600 focus:border-cyan-400/50 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
+              onChange={(event) => setLocation(event.target.value)}
+              placeholder="City, facility, or coordinates"
+              required
+              type="text"
+              value={location}
+            />
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-slate-300">Status</label>
+            <select
+              className="w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 focus:border-cyan-400/50 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
+              onChange={(event) => setStatus(event.target.value)}
+              value={status}
+            >
+              {STATUS_OPTIONS.map((option) => (
+                <option key={option} className="bg-slate-900" value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+          <button
+            className="inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-cyan-400 to-teal-400 px-5 py-3.5 text-base font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:from-cyan-300 hover:to-teal-300 disabled:cursor-not-allowed disabled:opacity-70 sm:w-auto"
+            disabled={isLoading}
+            type="submit"
           >
-            {STATUS_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-        <button
-          className="rounded-md bg-cyan-500 px-4 py-2 font-semibold text-slate-900 hover:bg-cyan-400 disabled:opacity-70"
-          disabled={isLoading}
-          type="submit"
-        >
-          {isLoading ? "Updating..." : "Add Step"}
-        </button>
-      </form>
+            {isLoading ? (
+              <span className="mr-2 h-5 w-5 animate-spin rounded-full border-2 border-slate-900 border-t-transparent" />
+            ) : null}
+            {isLoading ? "Updating…" : "Add step on-chain"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

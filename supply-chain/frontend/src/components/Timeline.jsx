@@ -11,10 +11,10 @@ function truncateAddress(address) {
 }
 
 function borderColor(status) {
-  if (status === "Delivered") return "border-l-4 border-emerald-500";
-  if (status === "In Transit" || status === "Shipped") return "border-l-4 border-blue-500";
-  if (status === "Out for Delivery") return "border-l-4 border-orange-500";
-  return "border-l-4 border-slate-300";
+  if (status === "Delivered") return "border-l-4 border-emerald-400";
+  if (status === "In Transit" || status === "Shipped") return "border-l-4 border-sky-400";
+  if (status === "Out for Delivery") return "border-l-4 border-orange-400";
+  return "border-l-4 border-slate-600";
 }
 
 function statusIcon(status) {
@@ -42,7 +42,7 @@ function formatDateTime(isoDate) {
 function Timeline({ steps }) {
   if (!steps || steps.length === 0) {
     return (
-      <div className="rounded-lg bg-white p-4 text-slate-600 shadow">
+      <div className="rounded-xl border border-white/10 bg-slate-900/50 p-4 text-slate-400 shadow-lg backdrop-blur-md">
         No tracking steps available.
       </div>
     );
@@ -62,32 +62,31 @@ function Timeline({ steps }) {
           }
         `}
       </style>
-      <div className="mb-4 rounded-lg bg-slate-900 p-4 text-sm text-slate-100">
-        <p className="font-semibold">
-          Total Steps: {steps.length} | First Seen: {firstSeen} | Last Updated: {lastUpdated} | Current Status:{" "}
-          {lastStep.status}
+      <div className="mb-4 rounded-xl border border-white/10 bg-slate-950/60 p-4 text-sm text-slate-200">
+        <p className="font-semibold leading-relaxed">
+          Total steps: {steps.length} · First seen: {firstSeen} · Last update: {lastUpdated} · Status: {lastStep.status}
         </p>
       </div>
       <div className="relative space-y-4 pl-6">
-        <div className="absolute left-2 top-0 h-full border-l-2 border-slate-300" />
+        <div className="absolute left-2 top-0 h-full border-l-2 border-white/15" />
         {steps.map((step, index) => (
           <div
-            className={`relative rounded-lg bg-white p-4 shadow ${borderColor(step.status)}`}
+            className={`relative rounded-xl border border-white/5 bg-slate-900/70 p-4 shadow-lg shadow-black/20 backdrop-blur-sm ${borderColor(step.status)}`}
             key={`${step.timestamp}-${index}`}
             style={{ animation: "timelineFadeSlide 360ms ease-out forwards", animationDelay: `${index * 100}ms`, opacity: 0 }}
           >
-            <span className="absolute -left-7 top-5 text-lg">●</span>
+            <span className="absolute -left-[1.35rem] top-5 text-lg text-cyan-400">●</span>
             {index === steps.length - 1 ? (
-              <span className="absolute right-3 top-3 rounded-full bg-cyan-100 px-2 py-1 text-xs font-semibold text-cyan-700">
-                LATEST
+              <span className="absolute right-3 top-3 rounded-full bg-cyan-500/20 px-2 py-1 text-xs font-semibold text-cyan-200 ring-1 ring-cyan-400/40">
+                Latest
               </span>
             ) : null}
             <div className="flex items-center gap-2">
               <span className="text-2xl">{statusIcon(step.status)}</span>
-              <h3 className="text-lg font-bold text-slate-800">{step.status}</h3>
+              <h3 className="text-lg font-bold text-white">{step.status}</h3>
             </div>
-            <p className="mt-2 text-sm text-slate-700">📍 {step.location}</p>
-            <p className="mt-1 text-xs text-slate-500">Updated by {truncateAddress(step.updatedBy)}</p>
+            <p className="mt-2 text-sm text-slate-300">📍 {step.location}</p>
+            <p className="mt-1 font-mono text-xs text-slate-500">Updated by {truncateAddress(step.updatedBy)}</p>
             <p className="mt-1 text-xs text-slate-500">{formatDateTime(step.timestamp)}</p>
           </div>
         ))}

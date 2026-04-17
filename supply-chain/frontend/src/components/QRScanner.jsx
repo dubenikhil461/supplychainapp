@@ -72,16 +72,17 @@ function QRScanner() {
   }, []);
 
   return (
-    <div className="mt-6 rounded-lg bg-white p-4 shadow">
-      <h3 className="mb-3 text-lg font-semibold text-slate-800">QR Scanner</h3>
-      <video className="w-full rounded-md border border-slate-300" ref={videoRef} />
-      {error ? <p className="mt-2 text-sm text-red-600">{error}</p> : null}
+    <div className="mt-6 rounded-2xl border border-white/10 bg-slate-900/50 p-5 shadow-xl shadow-black/30 backdrop-blur-md">
+      <h3 className="mb-1 text-lg font-semibold text-white">Camera scanner</h3>
+      <p className="mb-4 text-sm text-slate-400">Grant camera access, then aim at a product QR to open its page.</p>
+      <video className="w-full overflow-hidden rounded-xl border border-white/10 bg-black shadow-inner" ref={videoRef} />
+      {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
       <button
-        className="mt-4 rounded-md bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700"
+        className="mt-5 w-full rounded-xl bg-gradient-to-r from-cyan-400 to-teal-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:from-cyan-300 hover:to-teal-300 sm:w-auto"
         onClick={isScanning ? stopScan : startScan}
         type="button"
       >
-        {isScanning ? "Stop Scanning" : "Start Scanning"}
+        {isScanning ? "Stop scanning" : "Start scanning"}
       </button>
     </div>
   );
